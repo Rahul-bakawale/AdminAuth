@@ -14,14 +14,14 @@ export default async function handler(req, res) {
   const transporter = nodemailer.createTransport({
     service: "Gmail",
     auth: {
-      user: process.env.SMTP_USER, // abhi@diginow.co.uk
-      pass: process.env.SMTP_PASS, // yadmin123
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
     },
   });
 
   const mailOptions = {
     from: process.env.SMTP_USER,
-    to: "abhi@diginow.co.uk", // hardcoded admin email
+    to: "abhi@diginow.co.uk",
     subject: "New User Registered",
     html: `
       <p><strong>Full Name:</strong> ${fullName}</p>
