@@ -1,3 +1,4 @@
+"use client";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import InputField from "./InputField";
@@ -21,7 +22,7 @@ const UserFormModal = ({
             type="text"
             className="form-control mb-2"
             placeholder="Full Name"
-            value={form.fullName}
+            value={form?.fullName}
             onChange={(e) => setForm({ ...form, fullName: e.target.value })}
             required
           />
@@ -29,7 +30,7 @@ const UserFormModal = ({
             type="email"
             className="form-control mb-2"
             placeholder="Email"
-            value={form.email}
+            value={form?.email}
             onChange={(e) => setForm({ ...form, email: e.target.value })}
             required
           />
@@ -37,7 +38,7 @@ const UserFormModal = ({
             type="text"
             className="form-control mb-2"
             placeholder="Phone"
-            value={form.phone}
+            value={form?.phone}
             onChange={(e) => setForm({ ...form, phone: e.target.value })}
             required
           />
@@ -45,7 +46,7 @@ const UserFormModal = ({
             type="text"
             className="form-control"
             placeholder="Profile Pic URL"
-            value={form.profilePicture}
+            value={form?.profilePicture}
             onChange={(e) =>
               setForm({ ...form, profilePicture: e.target.value })
             }

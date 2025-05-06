@@ -85,7 +85,7 @@ export default function UserList() {
 
   const userCards = useMemo(
     () =>
-      users.map((user) => (
+      users?.map((user) => (
         <UserCard
           key={user._id}
           user={user}

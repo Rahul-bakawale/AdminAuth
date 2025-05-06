@@ -138,13 +138,13 @@ const ProductList = () => {
             </tr>
           </thead>
           <tbody>
-            {products.map((p) => (
-              <tr key={p._id}>
-                <td>{p.product_name}</td>
-                <td>${p.price}</td>
-                <td>{p.category_id}</td>
+            {products?.map((p) => (
+              <tr key={p?._id}>
+                <td>{p?.product_name}</td>
+                <td>${p?.price}</td>
+                <td>{p?.category_id}</td>
                 <td>
-                  <img src={p.image} width={50} />
+                  <img src={p?.image} width={50} />
                 </td>
                 <td>
                   <Buttons

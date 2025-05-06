@@ -1,3 +1,4 @@
+"use client";
 import { Modal, Form } from "react-bootstrap";
 import PropTypes from "prop-types";
 import InputField from "./InputField";
@@ -21,25 +22,25 @@ const CommonModal = ({
 
       <Modal.Body>
         <Form>
-          {fields.map((field, idx) => (
+          {fields?.map((field, idx) => (
             <Form.Group key={idx} className="mb-3">
-              <Form.Label>{field.label}</Form.Label>
-              {field.type === "textarea" ? (
+              <Form.Label>{field?.label}</Form.Label>
+              {field?.type === "textarea" ? (
                 <InputField
                   as="textarea"
                   rows={3}
-                  name={field.name}
-                  value={formData[field.name]}
+                  name={field?.name}
+                  value={formData[field?.name]}
                   onChange={handleChange}
-                  required={field.required}
+                  required={field?.required}
                 />
               ) : (
                 <InputField
-                  type={field.type}
-                  name={field.name}
-                  value={formData[field.name]}
+                  type={field?.type}
+                  name={field?.name}
+                  value={formData[field?.name]}
                   onChange={handleChange}
-                  required={field.required}
+                  required={field?.required}
                 />
               )}
             </Form.Group>
@@ -59,7 +60,6 @@ const CommonModal = ({
   );
 };
 
-// PropTypes for better validation and documentation
 CommonModal.propTypes = {
   showModal: PropTypes.bool.isRequired,
   handleClose: PropTypes.func.isRequired,
