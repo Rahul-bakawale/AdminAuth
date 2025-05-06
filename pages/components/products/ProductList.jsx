@@ -1,23 +1,14 @@
 import React, { useEffect, useState } from "react";
-import {
-  Button,
-  Modal,
-  Form,
-  Table,
-  Container,
-  Spinner,
-} from "react-bootstrap";
-import dynamic from "next/dynamic";
-
-const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
+import { Table, Container, Spinner } from "react-bootstrap";
+import CommonModal from "../common/CommonModal";
+import Buttons from "../common/Button";
+import { useRouter } from "next/router";
 
 const ProductList = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
-
   const [showModal, setShowModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
-
   const [formData, setFormData] = useState({
     product_name: "",
     price: "",
@@ -25,6 +16,7 @@ const ProductList = () => {
     image: "",
     description: "",
   });
+  const router = useRouter();
 
   const fetchProducts = async () => {
     setLoading(true);
@@ -102,18 +94,36 @@ const ProductList = () => {
   useEffect(() => {
     fetchProducts();
   }, []);
-
+  const fields = [
+    {
+      label: "Product Name",
+      name: "product_name",
+      type: "text",
+      required: true,
+    },
+    { label: "Price", name: "price", type: "number", required: true },
+    { label: "Category ID", name: "category_id", type: "text" },
+    { label: "Image URL", name: "image", type: "text" },
+    { label: "Description", name: "description", type: "textarea" },
+  ];
   return (
     <Container className="mt-4">
-      <h3>Products</h3>
-      <Button
-        variant="primary"
-        onClick={() => setShowModal(true)}
-        className="mb-3"
-      >
-        Add Product
-      </Button>
-
+      <div className="d-flex flex-wrap gap-3 mb-4">
+        <Buttons
+          variant="success"
+          onClick={() => setShowModal(true)}
+          className="d-flex align-items-center gap-2"
+        >
+          + Add Product
+        </Buttons>
+        <Buttons
+          variant="primary"
+          onClick={() => router.push("/users/user-list")}
+          className="d-flex align-items-center gap-2"
+        >
+          View User List
+        </Buttons>
+      </div>
       {loading ? (
         <Spinner animation="border" />
       ) : (
@@ -137,21 +147,21 @@ const ProductList = () => {
                   <img src={p.image} width={50} />
                 </td>
                 <td>
-                  <Button
+                  <Buttons
                     size="sm"
                     variant="warning"
                     onClick={() => handleEdit(p)}
                     className="me-2"
                   >
                     Edit
-                  </Button>
-                  <Button
+                  </Buttons>
+                  <Buttons
                     size="sm"
                     variant="danger"
                     onClick={() => handleDelete(p._id)}
                   >
                     Delete
-                  </Button>
+                  </Buttons>
                 </td>
               </tr>
             ))}
@@ -159,80 +169,16 @@ const ProductList = () => {
         </Table>
       )}
 
-      <Modal show={showModal} onHide={handleClose} size="lg">
-        <Modal.Header closeButton>
-          <Modal.Title>
-            {editingProduct ? "Edit Product" : "Add Product"}
-          </Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form>
-            <Form.Group className="mb-2">
-              <Form.Label>Product Name</Form.Label>
-              <Form.Control
-                type="text"
-                name="product_name"
-                value={formData.product_name}
-                onChange={handleChange}
-                required
-              />
-            </Form.Group>
-
-            <Form.Group className="mb-2">
-              <Form.Label>Price</Form.Label>
-              <Form.Control
-                type="number"
-                name="price"
-                value={formData.price}
-                onChange={handleChange}
-                required
-              />
-            </Form.Group>
-
-            <Form.Group className="mb-2">
-              <Form.Label>Category ID</Form.Label>
-              <Form.Control
-                type="text"
-                name="category_id"
-                value={formData.category_id}
-                onChange={handleChange}
-              />
-            </Form.Group>
-
-            <Form.Group className="mb-2">
-              <Form.Label>Image URL</Form.Label>
-              <Form.Control
-                type="text"
-                name="image"
-                value={formData.image}
-                onChange={handleChange}
-              />
-            </Form.Group>
-
-            <Form.Group className="mb-3">
-              <Form.Label>Description</Form.Label>
-
-              <Form.Control
-                type="description"
-                name="description"
-                value={formData.description}
-                onChange={(value) =>
-                  setFormData((f) => ({ ...f, description: value }))
-                }
-              />
-            </Form.Group>
-          </Form>
-        </Modal.Body>
-
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
-            Cancel
-          </Button>
-          <Button variant="success" onClick={handleSave}>
-            {editingProduct ? "Update" : "Create"}
-          </Button>
-        </Modal.Footer>
-      </Modal>
+      <CommonModal
+        showModal={showModal}
+        handleClose={handleClose}
+        handleSave={handleSave}
+        formData={formData}
+        handleChange={handleChange}
+        title={editingProduct ? "Edit Product" : "Add Product"}
+        fields={fields}
+        isEditing={!!editingProduct}
+      />
     </Container>
   );
 };

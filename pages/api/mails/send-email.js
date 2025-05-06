@@ -10,14 +10,6 @@ export default async function handler(req, res) {
   }
 
   try {
-    const html = `
-      <h2>New User Created</h2>
-      <p><strong>Name:</strong> ${fullName}</p>
-      <p><strong>Email:</strong> ${email}</p>
-      <p><strong>Password:</strong> ${password}</p>
-      <p><a href="http://localhost:3000/admin/login">Go to Admin Panel</a></p>
-    `;
-
     await sendEmail({
       subject: `New User Created: ${fullName}`,
       html,

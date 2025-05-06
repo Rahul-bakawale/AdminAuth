@@ -1,17 +1,7 @@
-// export default async function handler(req, res) {
-//   if (req.method === "POST") {
-//     res.status(200).json({ message: "Logged out successfully" });
-//   } else {
-//     res.status(405).end();
-//   }
-// }
-// pages/api/auth/logout.js
-
 import cookie from "cookie";
 
 export default async function handler(req, res) {
   if (req.method === "POST") {
-    // Clear the cookie
     res.setHeader(
       "Set-Cookie",
       cookie.serialize("token", "", {

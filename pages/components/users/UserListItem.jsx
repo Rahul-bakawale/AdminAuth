@@ -1,24 +1,25 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import Image from "next/image";
-import Modal from "react-bootstrap/Modal";
-import Button from "react-bootstrap/Button";
 import Spinner from "react-bootstrap/Spinner";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { FaEdit, FaTrash } from "react-icons/fa";
+import UserCard from "../common/UserCard";
+import UserFormModal from "../common/UserFormModal";
+import Buttons from "../common/Button";
+import { useRouter } from "next/router";
 
 export default function UserList() {
   const [users, setUsers] = useState([]);
-
   const [form, setForm] = useState({
     fullName: "",
     email: "",
     phone: "",
     profilePicture: "",
   });
-
   const [editingUser, setEditingUser] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   const fetchUsers = useCallback(async () => {
     setLoading(true);
@@ -27,7 +28,7 @@ export default function UserList() {
       const data = await res.json();
       setUsers(data);
     } catch (error) {
-      console.error("Error fetching users:", error);
+      toast.error("Failed to fetch users.");
     }
     setLoading(false);
   }, []);
@@ -38,103 +39,82 @@ export default function UserList() {
 
   const handleDelete = useCallback(
     async (id) => {
-      await fetch(`/api/users/${id}`, { method: "DELETE" });
-      fetchUsers();
+      try {
+        await fetch(`/api/users/${id}`, { method: "DELETE" });
+        toast.success("User deleted");
+        fetchUsers();
+      } catch {
+        toast.error("Failed to delete user");
+      }
     },
     [fetchUsers]
   );
 
-  const handleEdit = useCallback((user) => {
+  const handleEdit = (user) => {
     setEditingUser(user._id);
     setForm(user);
     setShowModal(true);
-  }, []);
-  const createUser = async (data) => {
-    return await fetch("/api/users", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    });
   };
 
-  const updateUser = async (id, data) => {
-    return await fetch(`/api/users/${id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    });
-  };
-  const handleSubmit = useCallback(
-    async (e) => {
-      e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-      let res;
-      if (editingUser) {
-        res = await updateUser(editingUser, form);
-      } else {
-        res = await createUser(form);
-      }
+    try {
+      const url = editingUser ? `/api/users/${editingUser}` : "/api/users";
+      const method = editingUser ? "PUT" : "POST";
+
+      const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
 
       if (res.ok) {
+        toast.success(editingUser ? "User updated" : "User created");
         fetchUsers();
-        setForm({ fullName: "", email: "", phone: "", profilePic: "" });
+        setForm({ fullName: "", email: "", phone: "", profilePicture: "" });
         setEditingUser(null);
         setShowModal(false);
+      } else {
+        toast.error("Failed to save user");
       }
-    },
-    [editingUser, form, fetchUsers]
-  );
+    } catch {
+      toast.error("Server error");
+    }
+  };
 
   const userCards = useMemo(
     () =>
       users.map((user) => (
-        <div
+        <UserCard
           key={user._id}
-          className="card shadow-sm border rounded p-3 position-relative m-2 user-card"
-          style={{
-            width: "18rem",
-            transition: "transform 0.2s ease",
-            overflow: "hidden",
-          }}
-        >
-          <Image
-            src={user.profilePic}
-            alt="Profile"
-            width={100}
-            height={100}
-            className="rounded-circle mx-auto d-block"
-            loading="lazy"
-          />
-          <div className="text-center mt-3">
-            <h5>{user.fullName}</h5>
-            <p className="mb-1">{user.email}</p>
-            <small>{user.phone}</small>
-          </div>
-          <div className="action-buttons">
-            <button
-              className="btn btn-sm btn-primary me-2"
-              onClick={() => handleEdit(user)}
-            >
-              <FaEdit />
-            </button>
-            <button
-              className="btn btn-sm btn-danger"
-              onClick={() => handleDelete(user._id)}
-            >
-              <FaTrash />
-            </button>
-          </div>
-        </div>
+          user={user}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+        />
       )),
-    [users, handleDelete, handleEdit]
+    [users, handleDelete]
   );
 
   return (
     <div className="container mt-4">
-      <h2 className="mb-4">User Management</h2>
-      <Button variant="success" onClick={() => setShowModal(true)}>
-        + Create User
-      </Button>
+      <div className="button-group">
+        <Buttons
+          variant="primary"
+          onClick={() => router.push("/products/product-list")}
+          className="custom-back-btn float-end"
+        >
+          ← Back
+        </Buttons>
+
+        <Buttons
+          variant="success"
+          onClick={() => setShowModal(true)}
+          className="floating-ring-button"
+        >
+          + Create User
+        </Buttons>
+      </div>
 
       {loading ? (
         <div className="text-center mt-4">
@@ -144,54 +124,20 @@ export default function UserList() {
         <div className="d-flex flex-wrap mt-4">{userCards}</div>
       )}
 
-      <Modal show={showModal} onHide={() => setShowModal(false)}>
-        <Modal.Header closeButton>
-          <Modal.Title>
-            {editingUser ? "Edit User" : "Add New User"}
-          </Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <form onSubmit={handleSubmit}>
-            <input
-              type="text"
-              className="form-control mb-2"
-              placeholder="Full Name"
-              value={form.fullName}
-              onChange={(e) => setForm({ ...form, fullName: e.target.value })}
-              required
-            />
-            <input
-              type="email"
-              className="form-control mb-2"
-              placeholder="Email"
-              value={form.email}
-              onChange={(e) => setForm({ ...form, email: e.target.value })}
-              required
-            />
-            <input
-              type="text"
-              className="form-control mb-2"
-              placeholder="Phone"
-              value={form.phone}
-              onChange={(e) => setForm({ ...form, phone: e.target.value })}
-              required
-            />
-            <input
-              type="text"
-              className="form-control"
-              placeholder="Profile Pic URL"
-              value={form.profilePicture}
-              onChange={(e) =>
-                setForm({ ...form, profilePicture: e.target.value })
-              }
-            />
+      <UserFormModal
+        show={showModal}
+        onClose={() => {
+          setShowModal(false);
+          setEditingUser(null);
+          setForm({ fullName: "", email: "", phone: "", profilePicture: "" });
+        }}
+        onSubmit={handleSubmit}
+        form={form}
+        setForm={setForm}
+        isEditing={!!editingUser}
+      />
 
-            <Button variant="primary" type="submit" className="w-100">
-              {editingUser ? "Update User" : "Add User"}
-            </Button>
-          </form>
-        </Modal.Body>
-      </Modal>
+      <ToastContainer position="top-right" autoClose={3000} />
     </div>
   );
 }
