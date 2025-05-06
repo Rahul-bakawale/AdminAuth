@@ -5,7 +5,7 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 First, run the development server:
 
 ```bash
-npm run dev
+npm run dev 
 # or
 yarn dev
 ```
@@ -32,3 +32,31 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+
+
+###  Admin Dashboard – Next.js + MongoDB + Bootstrap
+This is a **full-stack web application** built using **Next.js**, **MongoDB**, and **React Bootstrap**. It features a secure admin panel that allows for managing users and products through RESTful APIs.
+
+ #### Admin Authentication
+- Admin login using email and password.
+- Default seeded admin:
+  - **Email:** `abhi@diginow.co.uk`
+  - **Password:** `admin123`
+- Session-based route protection (can be enhanced with JWT or NextAuth).
+
+###  User Management
+Perform full CRUD operations.
+- Fields:
+  - Full Name
+  - Email (must be unique)
+  - Phone
+  - Profile Picture (via upload)
+
+  ### Product Management
+   Perform full CRUD operations.
+- Fields:
+  - Product Name
+  - Price
+  - Category
+  - Image
+  - Rich-text Description
